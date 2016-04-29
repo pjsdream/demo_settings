@@ -7,6 +7,7 @@ Fetch robot benchmark for motion planning
  * install from source code, or
  * command-line install  
    $ sudo apt-get install ros-indigo-fetch-gazebo
+* Moveit!
 * Gazebo for ROS
 * Gazebo shelf model
  * Download at: http://amazonpickingchallenge.org/2015/gazebo_pod.shtml?
@@ -18,15 +19,26 @@ $ catkin_make
   $ chmod +x scripts/prepare_simulated_robot.py
 
 ## Run benchmark
-$ launch move_fetch apc.launch
+* Run gazebo  
+  $ roslaunch move_fetch apc_gazebo.launch
 
-## Modify shelf position
+* Run apc_moveit.launch, which will run
+ * map->odom tf broadcaster
+ * *fetch_moveit_config/move_group.launch*
+ * *rviz* with local config file  
+   $ roslaunch move_fetch apc_moveit.launch
+ * **Moveit envirnment is not set up**
+
+## Modify shelf position in Gazebo
 $ gedit worlds/apc.sdf
 
-for example:
+For example:
 ```xml
     <include>
       <uri>model://kiva_pod</uri>
       <pose>1 0 0 0 0 1.57</pose>
     </include>
 ```
+
+## Modify environments in Moveit!
+* Modify apc_moveit.launch
