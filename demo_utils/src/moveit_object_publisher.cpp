@@ -53,15 +53,19 @@ int main(int argc, char **argv)
         sleep_t.sleep();
     }
 
+    ROS_INFO("Planning scene publisher ready");
+    fflush(stdout);
+
     // TODO: get object information through rosparam
     moveit_msgs::CollisionObject object;
     if (node_handle.hasParam("objects"))
     {
         XmlRpc::XmlRpcValue segment;
 
-        node_handle.getParam("objects", segment);
         ROS_INFO("Adding objects");
         fflush(stdout);
+
+        node_handle.getParam("objects", segment);
 
         if (segment.getType() == XmlRpc::XmlRpcValue::TypeStruct && segment.size() > 0)
         {
@@ -130,7 +134,6 @@ int main(int argc, char **argv)
 // the set of collision objects in the "world" part of the
 // planning scene. Note that we are using only the "object"
 // field of the attached_object message here.
-    ROS_INFO("Adding the object into the world at the location of the right wrist.");
     moveit_msgs::PlanningScene planning_scene;
     planning_scene.world.collision_objects.push_back(object);
     planning_scene.is_diff = true;
