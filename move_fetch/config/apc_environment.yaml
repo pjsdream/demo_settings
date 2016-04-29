@@ -1,0 +1,3 @@
+# collision object (assuming only one file input)
+objects:
+    shelf: [~/.gazebo/models/kova_pod/meshes/pod_lowres.stl, 1, 0, 0, 0, 0, 1]  # gazebo world reference

@@ -32,6 +32,12 @@
 
     <!-- map to odom tf broadcaster -->
     <node name="base_link_tf_broadcaster" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 odom base_link 100"/>
+
+    <!-- Moveit obstacle -->
+    <node name="shelf_publisher" pkg="demo_utils" type="moveit_object_publisher">
+      <remap from="planning_scene" to="planning_scene"/>
+      <rosparam command="load" file="$(find move_fetch)/config/apc_environment.yaml"/>
+    </node>
   </group>
 
   <group if="$(arg use_gazebo)">
