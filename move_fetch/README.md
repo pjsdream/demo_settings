@@ -20,7 +20,7 @@ $ catkin_make
 ## Run benchmark
 $ launch move_fetch apc.launch
 
-## Modify shelf 
+## Modify shelf position
 $ gedit worlds/apc.sdf
 
 for example:
