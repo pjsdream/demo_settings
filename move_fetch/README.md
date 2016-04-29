@@ -14,7 +14,7 @@ Fetch robot benchmark for motion planning
 ## Build
 $ catkin_make
 * If script is not built, make it executable
-  $ chmod +x scripts/prepare_simulated_robot.py
+$ chmod +x scripts/prepare_simulated_robot.py
 
 ## Run benchmark
 $ launch move_fetch apc.launch
