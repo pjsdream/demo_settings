@@ -5,7 +5,8 @@ Fetch robot benchmark for motion planning
 * ROS indigo
 * ROS fetch_gazebo package
  * install from source code, or
- * command-line install $ sudo apt-get install ros-indigo-fetch-gazebo)
+ * command-line install  
+   $ sudo apt-get install ros-indigo-fetch-gazebo
 * Gazebo for ROS
 * Gazebo shelf model
  * Download at: http://amazonpickingchallenge.org/2015/gazebo_pod.shtml?
@@ -13,14 +14,15 @@ Fetch robot benchmark for motion planning
 
 ## Build
 $ catkin_make
-* If script is not built, make it executable
-$ chmod +x scripts/prepare_simulated_robot.py
+* If script is not built, make it executable  
+  $ chmod +x scripts/prepare_simulated_robot.py
 
 ## Run benchmark
 $ launch move_fetch apc.launch
 
 ## Modify shelf 
 $ gedit worlds/apc.sdf
+
 for example:
 ```xml
     <include>
