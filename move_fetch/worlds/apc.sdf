@@ -9,7 +9,7 @@
     </include>
     <include>
       <uri>model://kiva_pod</uri>
-      <pose>1 0 0 0 0 1.57</pose>
+      <pose>1 0 0 0 0 1.00</pose>
     </include>
     <include>
       <uri>model://demo_cube</uri>
