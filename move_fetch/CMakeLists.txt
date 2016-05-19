@@ -4,7 +4,7 @@ project(move_fetch)
 ## show all files (http://wiki.ros.org/IDEs#QtCreator)
 #Add all files in subdirectories of the project in
 # a dummy_target so qtcreator have access to all files
-FILE(GLOB children ${CMAKE_SOURCE_DIR}/*)
+FILE(GLOB children ${CMAKE_SOURCE_DIR})
 FOREACH(child ${children})
   IF(IS_DIRECTORY ${child})
     file(GLOB_RECURSE dir_files "${child}/*")
