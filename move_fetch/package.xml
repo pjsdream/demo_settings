@@ -41,12 +41,15 @@
   <!--   <test_depend>gtest</test_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
 
+  <build_depend>roscpp</build_depend>
   <build_depend>angles</build_depend>
   <build_depend>control_toolbox</build_depend>
   <build_depend>gazebo_ros</build_depend>
   <build_depend>robot_controllers</build_depend>
   <build_depend>robot_controllers_interface</build_depend>
-
+  <build_depend>cmake_modules</build_depend>
+  
+  <run_depend>roscpp</run_depend>
   <run_depend>actionlib</run_depend>
   <run_depend>control_toolbox</run_depend>
   <run_depend>depth_image_proc</run_depend>
@@ -61,6 +64,7 @@
   <run_depend>rgbd_launch</run_depend>
   <run_depend>trajectory_msgs</run_depend>
   <run_depend>xacro</run_depend>
+  <run_depend>cmake_modules</run_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->
