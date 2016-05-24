@@ -23,7 +23,7 @@
       <arg name="headless" value="$(arg headless)"/>
       <!-- <arg name="world_name" value="$(find fetch_gazebo)/worlds/test_zone.sdf"/> -->
     </include>
-
+    
     <!-- Oh, you wanted a robot? -->
     <include file="$(find fetch_gazebo)/launch/include/$(arg robot).launch.xml" />
     
@@ -74,11 +74,9 @@
   
   <!-- ITOMP setting -->
   <rosparam command="load" file="$(find move_fetch)/config/params_fetch.yaml" ns="itomp_planner"/>
-  <rosparam command="load" file="$(find fetch_moveit_config)/config/controllers.yaml" ns="move_itomp"/>
   <rosparam command="load" file="$(find fetch_moveit_config)/config/kinematics.yaml" ns="move_itomp"/>
   <param name="/move_itomp/planning_plugin" value="itomp_ca_planner/ItompPlanner"/>
   <rosparam command="load" file="$(find fetch_moveit_config)/config/ompl_planning.yaml" />
-  <param name="/move_itomp/moveit_controller_manager" value="moveit_simple_controller_manager/MoveItSimpleControllerManager"/>
   
   <!-- map to odom tf broadcaster -->
   <node name="odom_tf_broadcaster" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 map odom 100"/>
