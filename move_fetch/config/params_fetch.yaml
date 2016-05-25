@@ -48,7 +48,7 @@ animate_endeffector_segment:
   right_arm: right_hand_endeffector_link
   unified_body: right_hand_endeffector_link
 trajectory_duration: 5.0
-trajectory_discretization: 0.05
+trajectory_discretization: 0.1
 phase_duration: 0.5
 friction_coefficient: 2.0
 lower_body_root: segment_0
