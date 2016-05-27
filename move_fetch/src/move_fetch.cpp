@@ -61,6 +61,7 @@ Any questions or comments should be sent to the author chpark@cs.unc.edu
 //#include <pcpred/prediction/kinect_predictor.h>
 #include <vector>
 #include <ros/topic.h>
+#include <control_msgs/GripperCommandGoal.h>
 
 
 namespace move_fetch
@@ -69,12 +70,31 @@ namespace move_fetch
 static const int PLANNER_INDEX = -1;
 
 MoveFetch::MoveFetch(const ros::NodeHandle& node_handle) :
-    node_handle_(node_handle)
+    node_handle_(node_handle),
+    gripper_client_("gripper_controller/gripper_action")
 {
 }
 
 MoveFetch::~MoveFetch()
 {
+}
+
+void MoveFetch::closeGripper()
+{
+    control_msgs::GripperCommandGoal goal;
+    goal.command.position = 0.01;
+    goal.command.max_effort = 1000.;
+    gripper_client_.sendGoal(goal);
+    gripper_client_.waitForResult();
+}
+
+void MoveFetch::openGripper()
+{
+    control_msgs::GripperCommandGoal goal;
+    goal.command.position = 0.10;
+    goal.command.max_effort = 1000.;
+    gripper_client_.sendGoal(goal);
+    gripper_client_.waitForResult();
 }
 
 void MoveFetch::run(const std::string& group_name)
@@ -162,11 +182,20 @@ void MoveFetch::run(const std::string& group_name)
 
             // set start / goal states and fill planning request
             initStartGoalStates(req, end_effector_poses, robot_states, index);
+            
+            // open/close gripper
+            if (action != -1)
+            {
+                if (index % 2 == 0)
+                    closeGripper();
+                else
+                    openGripper();
+            }
 
             // trajectory optimization using ITOMP
             plan(req, res);
             res.getMessage(response);
-
+            
             // store last goal state for next subtask
             last_goal_state_.reset(new robot_state::RobotState(res.trajectory_->getLastWayPoint()));
 

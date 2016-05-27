@@ -12,10 +12,24 @@
 #include <moveit_msgs/RobotTrajectory.h>
 #include <moveit_msgs/DisplayTrajectory.h>
 #include <ros/ros.h>
+#include <actionlib/client/simple_action_client.h>
+#include <control_msgs/GripperCommandAction.h>
 #include <Eigen/Dense>
 
 namespace move_fetch
 {
+
+/*
+ * Gripper closing using actionlib
+ * rostopic pub -1 /gripper_controller/gripper_action/goal control_msgs/GripperCommandActionGoal '{header:{}, goal_id:{}, goal:{command : {position : 0.01, max_effort : 1000}}}' // 1cm or 2cm between fingers?
+ *   topic: /gripper_controller/gripper_action/goal (Fetch robot manual)
+ *   type:  control_msgs/GripperCommandActionGoal   (Fetch robot manual)
+ *   goal.command.position = 0.01
+ *   goal.command.max_effort = 1000
+ * 
+ * Gripper opening using actionlib
+ * rostopic pub -1 /gripper_controller/gripper_action/goal control_msgs/GripperCommandActionGoal '{header:{}, goal_id:{}, goal:{command : {position : 0.10, max_effort : 1000}}}'
+ */
 
 class MoveFetch
 {
@@ -23,6 +37,9 @@ public:
     MoveFetch(const ros::NodeHandle& node_handle);
     ~MoveFetch();
 
+    void closeGripper();
+    void openGripper();
+    
     void run(const std::string& group_name);
 
 protected:
@@ -53,6 +70,9 @@ protected:
 	ros::Publisher vis_marker_array_publisher_;
     ros::Publisher start_state_display_publisher_;
     ros::Publisher goal_state_display_publisher_;
+    
+    // gripper actionlib client
+    actionlib::SimpleActionClient<control_msgs::GripperCommandAction> gripper_client_;
 
 	std::string group_name_;
 
