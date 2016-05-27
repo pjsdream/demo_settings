@@ -4,6 +4,11 @@
   <!-- By default, gazebo is not used. -->
   <arg name="use_gazebo" default="false"/>
   
+  <!-- By default, real robot is not used. -->
+  <arg name="use_real_robot" default="false"/>
+  <arg name="use_rviz"     if="$(arg use_real_robot)" value="false"/>
+  <arg name="use_rviz" unless="$(arg use_real_robot)" vaule="true"/>
+
   <!-- Gazebo setting. Copied from fetch_gazebo/launch/playground.launch -->
   <group if="$(arg use_gazebo)">
   
@@ -43,8 +48,8 @@
   
     <!-- We do not have a robot connected, so publish fake joint states -->
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
-      <param name="/use_gui" value="true"/>
-      <rosparam param="/source_list">[/move_group/fake_controller_joint_states]</rosparam>
+      <param name="/use_gui" value="false"/>
+      <rosparam param="/source_list" unless="$(arg use_real_robot)">[/move_group/fake_controller_joint_states]</rosparam>
     </node>
 
     <!-- Given the published joint states, publish tf for the robot links -->
@@ -54,7 +59,8 @@
     <arg name="pipeline" default="$(optenv PLANNING_PIPELINE ompl)" />
     <include file="$(find fetch_moveit_config)/launch/move_group.launch">
       <arg name="allow_trajectory_execution" value="true"/>
-      <arg name="fake_execution" value="true"/>
+      <arg name="fake_execution" value="false"     if="$(arg use_real_robot)"/>
+      <arg name="fake_execution" value="true"  unless="$(arg use_real_robot)"/>
       <arg name="info" value="true"/>
       <arg name="debug" value="false"/>
       <arg name="pipeline" value="$(arg pipeline)" />
@@ -79,13 +85,15 @@
   <rosparam command="load" file="$(find fetch_moveit_config)/config/ompl_planning.yaml" />
   
   <!-- map to odom tf broadcaster -->
-  <node name="odom_tf_broadcaster" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 map odom 100"/>
+  <node unless="$(arg use_real_robot)" name="odom_tf_broadcaster" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 map odom 100"/>
 
   <!-- Open rviz. Copied from fetch_moveit_config/launch/moveit_rviz.launch -->
-  <arg name="command_args" value="-d $(find move_fetch)/launch/table.rviz" />
-  <node name="$(anon rviz)" pkg="rviz" type="rviz" respawn="false"
-	args="$(arg command_args)" output="screen">
-    <rosparam command="load" file="$(find fetch_moveit_config)/config/kinematics.yaml"/>
-  </node>
+  <group if="$(arg use_rviz)">
+    <arg name="command_args" value="-d $(find move_fetch)/launch/table.rviz" />
+    <node name="$(anon rviz)" pkg="rviz" type="rviz" respawn="false"
+  	args="$(arg command_args)" output="screen">
+      <rosparam command="load" file="$(find fetch_moveit_config)/config/kinematics.yaml"/>
+    </node>
+  </group>
 
 </launch>
