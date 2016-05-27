@@ -60,6 +60,7 @@ Any questions or comments should be sent to the author chpark@cs.unc.edu
 #include <resource_retriever/retriever.h>
 //#include <pcpred/prediction/kinect_predictor.h>
 #include <vector>
+#include <ros/topic.h>
 
 
 namespace move_fetch
@@ -143,11 +144,12 @@ void MoveFetch::run(const std::string& group_name)
     while (ros::ok())
     {
         // TODO: recieve planning request
+        static int action = -1;
         
         // task initialization
         std::vector<Eigen::Affine3d> end_effector_poses;
         std::vector<robot_state::RobotState> robot_states;
-        if (initTask(end_effector_poses, robot_states) == false)
+        if (initTask(end_effector_poses, robot_states, action) == false)
             continue;
         
         // plan subtasks
@@ -175,8 +177,8 @@ void MoveFetch::run(const std::string& group_name)
             display_publisher_.publish(display_trajectory);
         }
         
-        // TODO: (plan once in current code)
-        break;
+        // TODO: receive planning request
+        action = 0;
     }
     
     // clean up
@@ -187,16 +189,10 @@ void MoveFetch::run(const std::string& group_name)
     ROS_INFO("Done");
 }
 
-bool MoveFetch::initTask(std::vector<Eigen::Affine3d>& end_effector_poses, std::vector<robot_state::RobotState>& robot_states)
+bool MoveFetch::initTask(std::vector<Eigen::Affine3d>& end_effector_poses, std::vector<robot_state::RobotState>& robot_states, int action)
 {
     end_effector_poses.resize(0);
 
-    robot_state::RobotState& start_state = planning_scene_->getCurrentStateNonConst();
-    if (last_goal_state_)
-    {
-        start_state = *last_goal_state_;
-    }
-    
     Eigen::Matrix3d rotation;
     rotation = Eigen::AngleAxisd(M_PI / 2.0, Eigen::Vector3d(0, 1, 0));
     const Eigen::Vector3d z_offset(0., 0., 0.15);
@@ -207,35 +203,71 @@ bool MoveFetch::initTask(std::vector<Eigen::Affine3d>& end_effector_poses, std::
     start_pose.rotate(rotation);
     
     // set tasks
-    const int action = 0; // TODO: acquire action label
-    for (int i = 0; i < 1; ++i)
+    if (action == -1) // from current robot state to start pose
     {
+        const std::string end_effector_name = "wrist_roll_link";
+        
+        sensor_msgs::JointStateConstPtr start_joint_state = ros::topic::waitForMessage<sensor_msgs::JointState>("/joint_states");
+        robot_state::RobotState start_state( robot_model_ );
+        start_state.setVariableValues(*start_joint_state);
+        start_state.update();
+        
+        end_effector_poses.push_back(start_state.getGlobalLinkTransform(end_effector_name));
         end_effector_poses.push_back(start_pose);
-
-        const int target_index = action;
-        Eigen::Affine3d goal_pose = Eigen::Affine3d::Identity();
-        goal_pose.translate(action_targets_[target_index]);
-        goal_pose.translate(z_offset);
-        goal_pose.rotate(rotation);
-        end_effector_poses.push_back(goal_pose);
-    }
-
-    end_effector_poses.push_back(start_pose);
-
-    // IK for finding robot states
-    robot_states.resize(end_effector_poses.size(), start_state);
-
-    for (int i = 0; i < robot_states.size(); ++i)
-    {
-        robot_states[i].update();
-        if (computeIKState(robot_states[i], end_effector_poses[i]) == false)
+        
+        // IK for finding robot states
+        robot_states.resize(end_effector_poses.size(), planning_scene_->getCurrentState());
+        robot_states[0] = start_state;
+        
+        for (int i = 1; i < robot_states.size(); ++i)
         {
-            ROS_INFO("IK Fail");
-            return false;
+            robot_states[i].update();
+            if (computeIKState(robot_states[i], end_effector_poses[i]) == false)
+            {
+                ROS_INFO("IK Fail");
+                return false;
+            }
         }
+    
+        ROS_INFO("IK Success");
     }
-
-    ROS_INFO("IK Success");
+    else
+    {
+        robot_state::RobotState& start_state = planning_scene_->getCurrentStateNonConst();
+        if (last_goal_state_)
+        {
+            start_state = *last_goal_state_;
+        }
+        
+        for (int i = 0; i < 1; ++i)
+        {
+            end_effector_poses.push_back(start_pose);
+    
+            const int target_index = action;
+            Eigen::Affine3d goal_pose = Eigen::Affine3d::Identity();
+            goal_pose.translate(action_targets_[target_index]);
+            goal_pose.translate(z_offset);
+            goal_pose.rotate(rotation);
+            end_effector_poses.push_back(goal_pose);
+        }
+    
+        end_effector_poses.push_back(start_pose);
+        
+        // IK for finding robot states
+        robot_states.resize(end_effector_poses.size(), start_state);
+        
+        for (int i = 0; i < robot_states.size(); ++i)
+        {
+            robot_states[i].update();
+            if (computeIKState(robot_states[i], end_effector_poses[i]) == false)
+            {
+                ROS_INFO("IK Fail");
+                return false;
+            }
+        }
+    
+        ROS_INFO("IK Success");
+    }
 
     return true;
 }

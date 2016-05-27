@@ -140,10 +140,11 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
+include_directories(include)
 include_directories(
-  include
   ${Eigen_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
+  ${catkin_INCLUDE_DIRS}
 )
 
 link_directories(
@@ -163,7 +164,6 @@ link_directories(
 ## Declare a C++ executable
 # add_executable(move_fetch_node src/move_fetch_node.cpp)
 add_executable(move_fetch
-  include/move_fetch/move_fetch.h
   src/move_fetch.cpp
 )
 
@@ -176,7 +176,6 @@ add_executable(move_fetch
 #   ${catkin_LIBRARIES}
 # )
 target_link_libraries(move_fetch
-  ${Boost_LIBRARIES}
   ${catkin_LIBRARIES}
 )
 

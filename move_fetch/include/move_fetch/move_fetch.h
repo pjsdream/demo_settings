@@ -30,7 +30,7 @@ protected:
     void loadActions();
     void initStartGoalStates(planning_interface::MotionPlanRequest& req, const std::vector<Eigen::Affine3d>& end_effector_poses,
                              const std::vector<robot_state::RobotState>& robot_states, int index = 0);
-    bool initTask(std::vector<Eigen::Affine3d>& end_effector_poses, std::vector<robot_state::RobotState>& robot_states);
+    bool initTask(std::vector<Eigen::Affine3d>& end_effector_poses, std::vector<robot_state::RobotState>& robot_states, int action);
 	bool isStateCollide(const robot_state::RobotState& state);
 	bool isStateSingular(robot_state::RobotState& state);
 
