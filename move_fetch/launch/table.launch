@@ -1,13 +1,14 @@
 <!-- If using Gazebo, launch with argument use_gazebo:=true -->
 <launch>
 
-  <!-- By default, gazebo is not used. -->
-  <arg name="use_gazebo" default="false"/>
-  
   <!-- By default, real robot is not used. -->
   <arg name="use_real_robot" default="false"/>
+  
+  <arg name="use_gazebo" unless="$(arg use_real_robot)" default="false"/>
+  <arg name="use_gazebo"     if="$(arg use_real_robot)" value="false"/>
+  
+  <arg name="use_rviz" unless="$(arg use_real_robot)" default="true"/>
   <arg name="use_rviz"     if="$(arg use_real_robot)" value="false"/>
-  <arg name="use_rviz" unless="$(arg use_real_robot)" vaule="true"/>
 
   <!-- Gazebo setting. Copied from fetch_gazebo/launch/playground.launch -->
   <group if="$(arg use_gazebo)">
